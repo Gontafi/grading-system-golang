@@ -22,10 +22,10 @@ func (s *ServiceV1) RemoveStudentFromLesson(studentID int, lessonID int) error {
 	return nil
 }
 
-func (s *ServiceV1) GetStudentsForLesson(lessonID int) ([]models.Student, error) {
+func (s *ServiceV1) GetStudentsForLesson(lessonID int) ([]models.User, error) {
 	students, err := s.repository.GetStudentsForLesson(lessonID)
 	if err != nil {
-		return []models.Student{}, err
+		return []models.User{}, err
 	}
 
 	return students, nil

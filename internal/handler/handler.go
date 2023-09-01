@@ -20,6 +20,22 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 		auth.Post("/sign-up", h.SignUp)
 	}
 
+	teacherRoute := app.Group("/marks", h.TeacherRoleMiddleware())
+	{
+		teacherRoute.Post("/check-homework", h.CheckHomeWorkAndPutGrades)
+		teacherRoute.Put("/change-mark/:id", h.UpdateMark)
+		teacherRoute.Delete("/delete-mark/:id", h.DeleteMark)
+	}
+	topRatings := app.Group("/top-ratings")
+	{
+		topRatings.Get("/", h.GetTopRatingFromCache)
+	}
+
+	topRatingsByLesson := app.Group("/top-ratings-by-lesson/:lessonID")
+	{
+		topRatingsByLesson.Get("/", h.GetTopRatingByLessonFromCache)
+	}
+
 	api := app.Group("/api")
 	api.Use(h.AuthMiddleware())
 
@@ -33,27 +49,6 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 		lessons.Get("students/:student_id", h.GetLessonsForStudent)
 	}
 
-	students := api.Group("/students")
-	{
-		students.Get("/", h.GetStudents)
-		students.Get("/:id", h.GetStudent)
-		students.Post("/", h.CreateStudent)
-		students.Put("/:id", h.UpdateStudent)
-		students.Delete("/:id", h.DeleteStudent)
-		students.Post("/:id/lessons/:lesson_id", h.AddStudentToLesson)
-		students.Delete("/:id/lessons/:lesson_id", h.RemoveStudentFromLesson)
-		students.Get("lessons/:lesson_id", h.GetStudentsForLesson)
-	}
-
-	teachers := api.Group("/teachers")
-	{
-		teachers.Get("/", h.GetTeachers)
-		teachers.Get("/:id", h.GetTeacher)
-		teachers.Post("/", h.CreateTeacher)
-		teachers.Put("/:id", h.UpdateTeacher)
-		teachers.Delete("/:id", h.DeleteTeacher)
-	}
-
 	users := api.Group("/users")
 	{
 		users.Get("/", h.GetUsers)
@@ -61,14 +56,17 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 		users.Post("/", h.CreateUser)
 		users.Put("/:id", h.UpdateUser)
 		users.Delete("/:id", h.DeleteUser)
+		users.Get("/:student_id/lessons/:lesson_id", h.GetStudentLesson)
+		users.Get("lessons/:lesson_id", h.GetStudentsForLesson)
 	}
-	topRatings := api.Group("/top-ratings")
+	enroll := api.Group("/student-lesson/", h.AdminRoleMiddleware())
 	{
-		topRatings.Get("/", h.GetTopRatingFromCache)
+		enroll.Post("student/:student_id/lesson/:lesson_id", h.AddStudentToLesson)
+		enroll.Delete("student/:student_id/lesson/:lesson_id", h.RemoveStudentFromLesson)
 	}
-
-	topRatingsByLesson := api.Group("/top-ratings-by-lesson/:lessonID")
+	marks := api.Group("/marks")
 	{
-		topRatingsByLesson.Get("/", h.GetTopRatingByLessonFromCache)
+		marks.Get("/:id", h.GetMark)
+		marks.Get("/", h.GetMarks)
 	}
 }

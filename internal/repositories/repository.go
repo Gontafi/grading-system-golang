@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/grading-system-golang/internal/models"
 	"github.com/jackc/pgx/v5"
+	"time"
 )
 
 type Repository interface {
@@ -12,26 +13,21 @@ type Repository interface {
 	GetAllMarks() ([]models.Mark, error)
 	DeleteMark(markID int) error
 	UpdateMark(mark models.Mark) error
-	GetStudentLesson(studentID int, lessonID int) (models.StudentLesson, error)
 	AddStudentToLesson(studentID int, lessonID int) (int, error)
 	RemoveStudentFromLesson(studentID int, lessonID int) error
-	GetStudentsForLesson(lessonID int) ([]models.Student, error)
+	GetStudentsForLesson(lessonID int) ([]models.User, error)
 	GetLessonsForStudent(studentID int) ([]models.Lesson, error)
+	GetStudentLesson(studentID int, lessonID int) (models.StudentLesson, error)
 	AddLesson(lesson models.Lesson) (int, error)
 	DeleteLesson(id int) error
 	UpdateLesson(lesson models.Lesson) error
 	AllLessons() ([]models.Lesson, error)
 	GetLessonByID(id int) (models.Lesson, error)
-	AddTeacher(teacher models.Teacher) (int, error)
-	DeleteTeacher(id int) error
-	UpdateTeacher(teacher models.Teacher) error
-	AllTeachers() ([]models.Teacher, error)
-	GetTeacherByID(id int) (models.Teacher, error)
-	AddStudent(student models.Student) (int, error)
-	DeleteStudent(id int) error
-	UpdateStudent(student models.Student) error
-	AllStudents() ([]models.Student, error)
-	GetStudentByID(id int) (models.Student, error)
+	AddRole(role models.Role) (int, error)
+	DeleteRole(id int) error
+	UpdateRole(role models.Role) error
+	AllRoles() ([]models.Role, error)
+	GetRoleByID(id int) (models.Role, error)
 	AddUser(user models.User) (int, error)
 	DeleteUser(id int) error
 	UpdateUser(user models.User) error
@@ -39,8 +35,8 @@ type Repository interface {
 	GetUserByID(id int) (models.User, error)
 	GetUserByUsername(username string) (models.User, error)
 
-	GetTopRating() ([]models.Rating, error)
-	GetTopRatingByLesson(lessonID int, limit int) ([]models.Rating, error)
+	GetTopRating(period time.Duration, limit int) ([]models.Rating, error)
+	GetTopRatingByLesson(lessonID int, period time.Duration, limit int) ([]models.Rating, error)
 }
 
 type RepositoryV1 struct {

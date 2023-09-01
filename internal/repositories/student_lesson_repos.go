@@ -29,34 +29,34 @@ func (r *RepositoryV1) RemoveStudentFromLesson(studentID int, lessonID int) erro
 	return nil
 }
 
-func (r *RepositoryV1) GetStudentsForLesson(lessonID int) ([]models.Student, error) {
+func (r *RepositoryV1) GetStudentsForLesson(lessonID int) ([]models.User, error) {
 	rows, err := r.db.Query(
 		r.ctx,
-		`SELECT s.id, s.name, s.surname FROM students s JOIN lessons l ON s.id = l.id WHERE l.id = $1`,
+		`SELECT s.id, s.name, s.surname FROM users s JOIN lessons l ON s.id = l.id WHERE l.id = $1`,
 		lessonID)
 	if err != nil {
-		return []models.Student{}, err
+		return []models.User{}, err
 	}
 	defer rows.Close()
 
-	var students []models.Student
+	var users []models.User
 	for rows.Next() {
-		var student models.Student
-		err := rows.Scan(&student.UserID, &student.Name, &student.Surname)
+		var user models.User
+		err := rows.Scan(&user.ID, &user.Name, &user.Surname)
 		if err != nil {
-			return []models.Student{}, err
+			return []models.User{}, err
 		}
 
-		students = append(students, student)
+		users = append(users, user)
 	}
 
-	return students, nil
+	return users, nil
 }
 
 func (r *RepositoryV1) GetLessonsForStudent(studentID int) ([]models.Lesson, error) {
 	rows, err := r.db.Query(
 		r.ctx,
-		`SELECT l.id, l.name FROM lessons l JOIN students s ON l.id = s.id WHERE s.id = $1`,
+		`SELECT l.id, l.name FROM lessons l JOIN users s ON l.id = s.id WHERE s.id = $1`,
 		studentID)
 	if err != nil {
 		return []models.Lesson{}, err

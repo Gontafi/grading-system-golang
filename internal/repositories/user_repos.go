@@ -9,9 +9,9 @@ func (r *RepositoryV1) AddUser(user models.User) (int, error) {
 
 	err := r.db.QueryRow(
 		r.ctx,
-		`INSERT INTO users(username, password_hash, role, created_at, updated_at) 
-			VALUES ($1, $2, $3, $4, $5) returning id`,
-		user.Username, user.PasswordHash, user.Role, user.CreatedAt, user.UpdatedAt,
+		`INSERT INTO users(username, password_hash, role_id, name, surname, created_at, updated_at) 
+			VALUES ($1, $2, $3, $4, $5, $6, $7) returning id`,
+		user.Username, user.PasswordHash, user.RoleID, user.Name, user.Surname, user.CreatedAt, user.UpdatedAt,
 	).Scan(&id)
 	if err != nil {
 		return 0, err
@@ -32,8 +32,9 @@ func (r *RepositoryV1) DeleteUser(id int) error {
 func (r *RepositoryV1) UpdateUser(user models.User) error {
 	_, err := r.db.Exec(
 		r.ctx,
-		`UPDATE users set username = $2, password_hash = $3, role = $4, updated_at = $5 WHERE id = $1`,
-		user.ID, user.Username, user.PasswordHash, user.Role, user.UpdatedAt,
+		`UPDATE users 
+		SET username = $2, password_hash = $3, role_id = $4, name = $5, surname = $6, updated_at = $5 WHERE id = $1`,
+		user.ID, user.Username, user.PasswordHash, user.RoleID, user.Name, user.Surname, user.UpdatedAt,
 	)
 	if err != nil {
 		return err
@@ -53,7 +54,8 @@ func (r *RepositoryV1) AllUsers() ([]models.User, error) {
 
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.ID, &user.Username, &user.PasswordHash, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.ID, &user.Username, &user.PasswordHash,
+			&user.RoleID, &user.Name, &user.Surname, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
 			return []models.User{}, err
 		}
@@ -66,8 +68,9 @@ func (r *RepositoryV1) AllUsers() ([]models.User, error) {
 
 func (r *RepositoryV1) GetUserByID(id int) (models.User, error) {
 	var user models.User
-	err := r.db.QueryRow(r.ctx, `SELECT * FROM users WHERE id = $1`, id).Scan(
-		&user.ID, &user.Username, &user.PasswordHash, &user.Role, &user.CreatedAt, &user.UpdatedAt,
+	err := r.db.QueryRow(r.ctx, `SELECT id, username, role_id, name, surname  FROM users WHERE id = $1`,
+		id).Scan(&user.ID, &user.Username, &user.PasswordHash, &user.RoleID, &user.Name,
+		&user.Surname, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		return models.User{}, err
@@ -78,8 +81,12 @@ func (r *RepositoryV1) GetUserByID(id int) (models.User, error) {
 
 func (r *RepositoryV1) GetUserByUsername(username string) (models.User, error) {
 	var user models.User
-	err := r.db.QueryRow(r.ctx, `SELECT * FROM users WHERE username = $1`, username).Scan(
-		&user.ID, &user.Username, &user.PasswordHash, &user.Role, &user.CreatedAt, &user.UpdatedAt,
+	err := r.db.QueryRow(r.ctx, `
+			SELECT id, username, password_hash, role_id, name, surname 
+			FROM users WHERE username = $1
+			`, username).Scan(
+		&user.ID, &user.Username, &user.PasswordHash, &user.RoleID,
+		&user.Name, &user.Surname,
 	)
 	if err != nil {
 		return models.User{}, err

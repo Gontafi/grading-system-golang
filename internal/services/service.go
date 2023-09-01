@@ -15,31 +15,30 @@ type Service interface {
 	GetAllUsers() ([]models.User, error)
 	GetUserByID(id int) (models.User, error)
 	GetUserByUsername(username string) (models.User, error)
-	AddTeacher(teacher models.Teacher) (int, error)
-	DeleteTeacher(id int) error
-	UpdateTeacher(teacher models.Teacher) error
-	GetAllTeachers() ([]models.Teacher, error)
-	GetTeacherByID(id int) (models.Teacher, error)
-	AddStudent(student models.Student) (int, error)
-	DeleteStudent(id int) error
-	UpdateStudent(student models.Student) error
-	GetAllStudents() ([]models.Student, error)
-	GetStudentByID(id int) (models.Student, error)
+	AddRole(role models.Role) (int, error)
+	DeleteRole(id int) error
+	UpdateRole(role models.Role) error
+	GetAllRoles() ([]models.Role, error)
+	GetRoleByID(id int) (models.Role, error)
 	AddStudentToLesson(studentID int, lessonID int) (int, error)
 	RemoveStudentFromLesson(studentID int, lessonID int) error
-	GetStudentsForLesson(lessonID int) ([]models.Student, error)
+	GetStudentsForLesson(lessonID int) ([]models.User, error)
 	GetLessonsForStudent(studentID int) ([]models.Lesson, error)
+	GetStudentLesson(studentID int, lessonID int) (models.StudentLesson, error)
 	CreateMark(mark models.Mark) (int, error)
 	GetMarkByID(markID int) (models.Mark, error)
 	GetAllMarks() ([]models.Mark, error)
 	DeleteMark(markID int) error
 	UpdateMark(mark models.Mark) error
-	GetStudentLesson(studentID int, lessonID int) (models.StudentLesson, error)
 	AddLesson(lesson models.Lesson) (int, error)
 	DeleteLesson(id int) error
 	UpdateLesson(lesson models.Lesson) error
 	GetAllLessons() ([]models.Lesson, error)
 	GetLessonByID(id int) (models.Lesson, error)
+
+	GetTopRatingFromCache(period time.Duration, limit int) ([]models.Rating, error)
+	GetTopRatingByLessonFromCache(lessonID int, period time.Duration, limit int) ([]models.Rating, error)
+	getCacheKey(baseKey string, args ...interface{}) string
 }
 
 type ServiceV1 struct {

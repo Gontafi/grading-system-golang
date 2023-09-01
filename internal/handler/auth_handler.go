@@ -19,8 +19,8 @@ const (
 )
 
 type Claims struct {
-	UserID int    `json:"user_id"`
-	Role   string `json:"role"`
+	UserID int `json:"user_id"`
+	RoleID int `json:"role_id"`
 	jwt.RegisteredClaims
 }
 
@@ -64,13 +64,13 @@ func (h *Handler) SignIn(c *fiber.Ctx) error {
 	}
 
 	if user.PasswordHash != generateHashPasswordHash(form.Password) {
-		log.Println(errors.New("Invalid credentials"))
+		log.Println(errors.New("invalid credentials, wrong password"))
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Invalid credentials"})
 	}
 
 	token, err := GenerateToken(user)
 	if err != nil {
-		log.Println(err) // Add this line to log the error
+		log.Println(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Error generating token"})
 	}
 
@@ -81,7 +81,7 @@ func GenerateToken(user models.User) (string, error) {
 	expTime := time.Now().Add(tokenTTL)
 	claims := &Claims{
 		UserID: user.ID,
-		Role:   user.Role,
+		RoleID: user.RoleID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expTime),
 		},
@@ -116,8 +116,7 @@ func ParseToken(accessToken string) (*Claims, error) {
 		return nil, err
 	}
 	claims, ok := token.Claims.(*Claims)
-	log.Println(claims.UserID) //TODO
-	log.Println(claims.Role)
+
 	if !ok {
 		return nil, errors.New("token claims are not of type *tokenClaims")
 	}

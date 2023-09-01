@@ -74,7 +74,6 @@ func startGradingSystem() {
 		cfg.Database.Port,
 		cfg.Database.DBName,
 	)
-	log.Println(databaseURL)
 	db, err = pgx.Connect(ctx, databaseURL)
 	if err != nil {
 		log.Println("failed connection to the database", err)
@@ -119,7 +118,6 @@ func stopGradingSystem() {
 		err := db.Close(context.Background())
 		if err != nil {
 			log.Println("failed to close database postgres", err)
-			return
 		}
 	}
 
@@ -127,14 +125,13 @@ func stopGradingSystem() {
 		err := redisClient.Close()
 		if err != nil {
 			log.Println("failed to close redis", err)
-			return
 		}
 	}
+
 	if app != nil {
 		err := app.Shutdown()
 		if err != nil {
 			log.Println("failed to close server", err)
-			return
 		}
 	}
 }

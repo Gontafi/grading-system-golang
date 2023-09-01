@@ -1,34 +1,30 @@
 package handler
 
 import (
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/grading-system-golang/internal/models"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
-func (h *Handler) CreateMark(ctx *fiber.Ctx) error {
+func (h *Handler) CheckHomeWorkAndPutGrades(ctx *fiber.Ctx) error {
 	var request models.Mark
 	err := ctx.BodyParser(&request)
 	if err != nil {
 		log.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
+	dateLayout := "2006-01-02" // Layout for "YYYY-MM-DD" format
+	parsedDate, err := time.Parse(dateLayout, request.Date)
 
-	tokenString := ctx.Get("Authorization")
-	claims, err := ParseToken(tokenString)
+	request.Date = parsedDate.String()
+
 	if err != nil {
 		log.Println(err)
-		return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid date format"})
 	}
-
-	if claims.Role != "teacher" || claims.UserID != request.TeacherID {
-		log.Println(errors.New("Access denied")) // Log a custom error message
-		return ctx.Status(http.StatusForbidden).JSON(fiber.Map{"error": "Access denied"})
-	}
-
 	_, err = h.Service.GetStudentLesson(request.StudentID, request.LessonID)
 	if err != nil {
 		log.Println(err)
@@ -64,6 +60,11 @@ func (h *Handler) UpdateMark(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
+	dateLayout := "2006-01-02" // Layout for "YYYY-MM-DD" format
+	parsedDate, err := time.Parse(dateLayout, request.Date)
+
+	request.Date = parsedDate.String()
+
 	tokenString := ctx.Get("Authorization")
 	claims, err := ParseToken(tokenString)
 	if err != nil {
@@ -77,8 +78,7 @@ func (h *Handler) UpdateMark(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve mark"})
 	}
 
-	if claims.Role != "teacher" || claims.UserID != existingMark.TeacherID {
-		log.Println(errors.New("Access denied"))
+	if claims.UserID != existingMark.TeacherID {
 		return ctx.Status(http.StatusForbidden).JSON(fiber.Map{"error": "Access denied"})
 	}
 
@@ -109,12 +109,11 @@ func (h *Handler) DeleteMark(ctx *fiber.Ctx) error {
 
 	existingMark, err := h.Service.GetMarkByID(markID)
 	if err != nil {
-		log.Println(err) // Add this line to log the error
+		log.Println(err)
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve mark"})
 	}
 
-	if claims.Role != "teacher" || claims.UserID != existingMark.TeacherID {
-		log.Println(errors.New("Access denied"))
+	if claims.UserID != existingMark.TeacherID {
 		return ctx.Status(http.StatusForbidden).JSON(fiber.Map{"error": "Access denied"})
 	}
 

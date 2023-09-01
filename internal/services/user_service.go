@@ -3,19 +3,16 @@ package services
 import (
 	"errors"
 	"github.com/grading-system-golang/internal/models"
-	"strings"
 	"time"
 )
 
 func (s *ServiceV1) AddUser(user models.User) (int, error) {
-	if user.Username == "" || user.PasswordHash == "" || user.Role == "" {
+	if user.Username == "" || user.RoleID == 0 || user.Name == "" || user.Surname == "" {
 		return 0, errors.New("user data cannot be empty")
 	}
 
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-
-	user.Role = strings.ToLower(user.Role)
 
 	id, err := s.repository.AddUser(user)
 	if err != nil {
@@ -35,10 +32,9 @@ func (s *ServiceV1) DeleteUser(id int) error {
 }
 
 func (s *ServiceV1) UpdateUser(user models.User) error {
-	if user.Username == "" || user.PasswordHash == "" || user.Role == "" {
+	if user.Username == "" || user.PasswordHash == "" || user.Name == "" || user.Surname == "" {
 		return errors.New("user data cannot be empty")
 	}
-
 	err := s.repository.UpdateUser(user)
 	if err != nil {
 		return err

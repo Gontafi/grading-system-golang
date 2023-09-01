@@ -1,11 +1,14 @@
-DROP TABLE marks;
+DROP TABLE IF EXISTS roles;
 
-DROP TABLE student_lesson;
+DROP TABLE IF EXISTS marks;
 
-DROP TABLE lessons;
+DROP TABLE IF EXISTS student_lesson;
 
-DROP TABLE teachers;
+DROP TABLE IF EXISTS lessons;
 
-DROP TABLE students;
+DROP TABLE IF EXISTS teachers;
 
-DROP TABLE users;
+DROP TABLE IF EXISTS students;
+
+DROP TABLE IF EXISTS users;
+

@@ -26,12 +26,20 @@ func (h *Handler) CreateLesson(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateLesson(ctx *fiber.Ctx) error {
+	lessonID, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		log.Println(err)
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid lesson ID"})
+	}
+
 	var request models.Lesson
-	err := ctx.BodyParser(&request)
+	err = ctx.BodyParser(&request)
 	if err != nil {
 		log.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
+
+	request.ID = lessonID
 
 	err = h.Service.UpdateLesson(request)
 	if err != nil {
@@ -79,7 +87,7 @@ func (h *Handler) GetLesson(ctx *fiber.Ctx) error {
 func (h *Handler) GetLessons(ctx *fiber.Ctx) error {
 	lessons, err := h.Service.GetAllLessons()
 	if err != nil {
-		log.Println(err) // Add this line to log the error
+		log.Println(err)
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve lessons"})
 	}
 

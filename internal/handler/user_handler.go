@@ -26,12 +26,21 @@ func (h *Handler) CreateUser(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateUser(ctx *fiber.Ctx) error {
+	userIDParam := ctx.Params("id")
+	userID, err := strconv.Atoi(userIDParam)
+	if err != nil {
+		log.Println(err)
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+
 	var request models.User
-	err := ctx.BodyParser(&request)
+	err = ctx.BodyParser(&request)
 	if err != nil {
 		log.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
+
+	request.ID = userID
 
 	err = h.Service.UpdateUser(request)
 	if err != nil {
