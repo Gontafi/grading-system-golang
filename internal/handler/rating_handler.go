@@ -19,14 +19,18 @@ func (h *Handler) GetTopRatingFromCache(ctx *fiber.Ctx) error {
 	limitParam := ctx.Query("limit")
 
 	var period time.Duration
-	if periodParam == "week" {
+	switch periodParam {
+	case "week":
 		period = weekDuration
-	}
-	if periodParam == "month" {
+	case "month":
 		period = monthDuration
-	}
-	if periodParam == "year" {
+	case "year":
 		period = yearDuration
+	default:
+		period = 0
+	}
+	if period == 0 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid period"})
 	}
 
 	limit, err := strconv.Atoi(limitParam)
