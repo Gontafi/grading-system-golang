@@ -8,14 +8,25 @@ import (
 	"time"
 )
 
+const (
+	weekDuration  = time.Hour * 24 * 7
+	monthDuration = weekDuration * 4
+	yearDuration  = time.Hour * 24 * 365
+)
+
 func (h *Handler) GetTopRatingFromCache(ctx *fiber.Ctx) error {
 	periodParam := ctx.Query("period")
 	limitParam := ctx.Query("limit")
 
-	period, err := time.ParseDuration(periodParam)
-	if err != nil {
-		log.Println(err)
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid period"})
+	var period time.Duration
+	if periodParam == "week" {
+		period = weekDuration
+	}
+	if periodParam == "month" {
+		period = monthDuration
+	}
+	if periodParam == "year" {
+		period = yearDuration
 	}
 
 	limit, err := strconv.Atoi(limitParam)
