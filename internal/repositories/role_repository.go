@@ -6,7 +6,7 @@ import (
 
 func (r *RepositoryV1) AddRole(role models.Role) (int, error) {
 
-	_, err := r.db.Exec(r.ctx, `INSERT INTO roles(role_name) VALUES ($1)`, role.RoleName)
+	_, err := r.db.Exec(r.ctx, `INSERT INTO roles(name, status_id) VALUES ($1, $2)`, role.Name, role.StatusID)
 	if err != nil {
 		return 0, err
 	}
@@ -24,7 +24,7 @@ func (r *RepositoryV1) DeleteRole(id int) error {
 }
 
 func (r *RepositoryV1) UpdateRole(role models.Role) error {
-	_, err := r.db.Exec(r.ctx, `UPDATE roles set role_name = $2 WHERE id = $1`, role.ID)
+	_, err := r.db.Exec(r.ctx, `UPDATE roles set name = $2, status_id = $3 WHERE id = $1`, role.ID, role.StatusID)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (r *RepositoryV1) UpdateRole(role models.Role) error {
 }
 
 func (r *RepositoryV1) AllRoles() ([]models.Role, error) {
-	rows, err := r.db.Query(r.ctx, `SELECT id, role_name FROM roles`)
+	rows, err := r.db.Query(r.ctx, `SELECT id, name, status_id FROM roles`)
 	if err != nil {
 		return []models.Role{}, err
 	}
@@ -43,7 +43,7 @@ func (r *RepositoryV1) AllRoles() ([]models.Role, error) {
 
 	for rows.Next() {
 		var role models.Role
-		err := rows.Scan(&role.ID, &role.RoleName)
+		err := rows.Scan(&role.ID, &role.Name, &role.StatusID)
 		if err != nil {
 			return []models.Role{}, err
 		}
@@ -56,8 +56,8 @@ func (r *RepositoryV1) AllRoles() ([]models.Role, error) {
 
 func (r *RepositoryV1) GetRoleByID(id int) (models.Role, error) {
 	var role models.Role
-	err := r.db.QueryRow(r.ctx, `SELECT id, role_name FROM roles WHERE id = $1`, id).Scan(
-		&role.ID, &role.RoleName,
+	err := r.db.QueryRow(r.ctx, `SELECT id, name, status_id FROM roles WHERE id = $1`, id).Scan(
+		&role.ID, &role.Name, &role.StatusID,
 	)
 	if err != nil {
 		return models.Role{}, err

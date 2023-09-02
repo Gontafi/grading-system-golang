@@ -2,11 +2,9 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/grading-system-golang/internal/models"
 	"github.com/redis/go-redis/v9"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -16,7 +14,25 @@ const (
 	YearDuration  = 365 * 24 * time.Hour
 )
 
-func (s *ServiceV1) GetTopRatingFromCache(period time.Duration, limit int) ([]models.Rating, error) {
+func (s *ServiceV1) GetTopRatingFromCache(period string, limit int) ([]models.Rating, error) {
+
+	var periodTime time.Duration
+
+	switch period {
+	case "week":
+		periodTime = WeekDuration
+	case "month":
+		periodTime = MonthDuration
+	case "year":
+		periodTime = YearDuration
+	default:
+		periodTime = 0
+	}
+
+	if periodTime == 0 {
+		return []models.Rating{}, errors.New("invalid period time")
+	}
+
 	cacheKey := s.getCacheKey("topRating", period, limit)
 
 	data, err := s.rdb.Get(s.ctx, cacheKey).Bytes()
@@ -30,7 +46,7 @@ func (s *ServiceV1) GetTopRatingFromCache(period time.Duration, limit int) ([]mo
 		return nil, err
 	}
 
-	ratings, err := s.repository.GetTopRating(period, limit)
+	ratings, err := s.repository.GetTopRating(periodTime, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -78,23 +94,4 @@ func (s *ServiceV1) GetTopRatingByLessonFromCache(
 	}
 
 	return ratings, nil
-}
-
-func (s *ServiceV1) getCacheKey(baseKey string, args ...interface{}) string {
-	keyParts := []string{baseKey}
-	for _, arg := range args {
-		keyParts = append(keyParts, argToString(arg))
-	}
-	return strings.Join(keyParts, ":")
-}
-
-func argToString(arg interface{}) string {
-	switch v := arg.(type) {
-	case time.Duration:
-		return v.String()
-	case int:
-		return strconv.Itoa(v)
-	default:
-		return fmt.Sprintf("%v", v)
-	}
 }

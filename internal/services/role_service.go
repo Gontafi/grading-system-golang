@@ -6,7 +6,7 @@ import (
 )
 
 func (s *ServiceV1) AddRole(role models.Role) (int, error) {
-	if role.RoleName == "" {
+	if role.Name == "" {
 		return 0, errors.New("role name cannot be empty")
 	}
 
@@ -28,7 +28,7 @@ func (s *ServiceV1) DeleteRole(id int) error {
 }
 
 func (s *ServiceV1) UpdateRole(role models.Role) error {
-	if role.RoleName == "" {
+	if role.Name == "" {
 		return errors.New("role name cannot be empty")
 	}
 

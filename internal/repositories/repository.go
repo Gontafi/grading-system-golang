@@ -34,6 +34,11 @@ type Repository interface {
 	AllUsers() ([]models.User, error)
 	GetUserByID(id int) (models.User, error)
 	GetUserByUsername(username string) (models.User, error)
+	AddRoleUser(roleID int, userID int) (int, error)
+	RemoveRoleUser(roleID int, userID int) error
+	GetUsersForRole(roleID int) ([]models.User, error)
+	GetRolesForUser(userID int) ([]models.Role, error)
+	GetUserRole(userID int) (models.Role, error)
 
 	GetTopRating(period time.Duration, limit int) ([]models.Rating, error)
 	GetTopRatingByLesson(lessonID int, period time.Duration, limit int) ([]models.Rating, error)

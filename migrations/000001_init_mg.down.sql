@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS roles;
-
 DROP TABLE IF EXISTS marks;
 
 DROP TABLE IF EXISTS student_lesson;
@@ -10,5 +8,10 @@ DROP TABLE IF EXISTS teachers;
 
 DROP TABLE IF EXISTS students;
 
+DROP TABLE IF EXISTS role_user;
+
 DROP TABLE IF EXISTS users;
+
+DROP TABLE IF EXISTS roles;
+
 

@@ -4,19 +4,23 @@ import "time"
 
 type Role struct {
 	ID       int    `json:"ID"`
-	RoleName string `json:"role_name"`
+	Name     string `json:"role_name"`
+	StatusID int    `json:"status_id"`
 }
 type User struct {
 	ID           int       `json:"id" required:"-"`
 	Username     string    `json:"username"`
 	PasswordHash string    `json:"password"`
-	RoleID       int       `json:"role"`
 	Name         string    `json:"name"`
-	Surname      string    `json:"surname"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
+type RoleUser struct {
+	ID     int `json:"id"`
+	RoleID int `json:"role_Id"`
+	UserID int `json:"userID"`
+}
 type Lesson struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`

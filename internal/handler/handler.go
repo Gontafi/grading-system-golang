@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 		teacherRoute.Put("/change-mark/:id", h.UpdateMark)
 		teacherRoute.Delete("/delete-mark/:id", h.DeleteMark)
 	}
+
 	topRatings := app.Group("/top-ratings")
 	{
 		topRatings.Get("/", h.GetTopRatingFromCache)
@@ -43,30 +44,44 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 	{
 		lessons.Get("/", h.GetLessons)
 		lessons.Get("/:id", h.GetLesson)
-		lessons.Post("/", h.CreateLesson)
-		lessons.Put("/:id", h.UpdateLesson)
-		lessons.Delete("/:id", h.DeleteLesson)
 		lessons.Get("students/:student_id", h.GetLessonsForStudent)
 	}
 
-	users := api.Group("/users")
-	{
-		users.Get("/", h.GetUsers)
-		users.Get("/:id", h.GetUser)
-		users.Post("/", h.CreateUser)
-		users.Put("/:id", h.UpdateUser)
-		users.Delete("/:id", h.DeleteUser)
-		users.Get("/:student_id/lessons/:lesson_id", h.GetStudentLesson)
-		users.Get("lessons/:lesson_id", h.GetStudentsForLesson)
-	}
-	enroll := api.Group("/student-lesson/", h.AdminRoleMiddleware())
-	{
-		enroll.Post("student/:student_id/lesson/:lesson_id", h.AddStudentToLesson)
-		enroll.Delete("student/:student_id/lesson/:lesson_id", h.RemoveStudentFromLesson)
-	}
 	marks := api.Group("/marks")
 	{
 		marks.Get("/:id", h.GetMark)
 		marks.Get("/", h.GetMarks)
+	}
+
+	admin := api.Group("/admin", h.AdminRoleMiddleware())
+	{
+
+		admin.Post("/user-role/:user_id/role/:role_id", h.AddRoleUser)
+		admin.Delete("/user-role/:user_id/role/:role_id", h.RemoveRoleUser)
+		admin.Get("/users/:role_id", h.GetUsersForRole)
+		admin.Get("/roles/:user_id", h.GetRolesForUser)
+		admin.Get("/user-role/:user_id", h.GetUserRole)
+
+		enroll := admin.Group("/student-lesson/", h.AdminRoleMiddleware())
+		{
+			enroll.Post("student/:student_id/lesson/:lesson_id", h.AddStudentToLesson)
+			enroll.Delete("student/:student_id/lesson/:lesson_id", h.RemoveStudentFromLesson)
+		}
+		lessonsAdmin := admin.Group("/lessons")
+		{
+			lessonsAdmin.Post("/", h.CreateLesson)
+			lessonsAdmin.Put("/:id", h.UpdateLesson)
+			lessonsAdmin.Delete("/:id", h.DeleteLesson)
+		}
+		users := admin.Group("/users")
+		{
+			users.Get("/", h.GetUsers)
+			users.Get("/:id", h.GetUser)
+			users.Post("/", h.CreateUser)
+			users.Put("/:id", h.UpdateUser)
+			users.Delete("/:id", h.DeleteUser)
+			users.Get("/:student_id/lessons/:lesson_id", h.GetStudentLesson)
+			users.Get("lessons/:lesson_id", h.GetStudentsForLesson)
+		}
 	}
 }

@@ -3,12 +3,20 @@ package services
 import (
 	"errors"
 	"github.com/grading-system-golang/internal/models"
+	"time"
 )
 
 func (s *ServiceV1) CreateMark(mark models.Mark) (int, error) {
 	if mark.HomeWorkGrade < 1 || mark.HomeWorkGrade > 5 || (mark.AttendanceGrade != 0 && mark.AttendanceGrade != 1) {
 		return 0, errors.New("invalid mark data")
 	}
+
+	dateLayout := "2006-01-02" // Layout for "YYYY-MM-DD" format
+	parsedDate, err := time.Parse(dateLayout, mark.Date)
+	if err != nil {
+		return 0, err
+	}
+	mark.Date = parsedDate.String()
 
 	markID, err := s.repository.CreateMark(mark)
 	if err != nil {
@@ -46,7 +54,12 @@ func (s *ServiceV1) DeleteMark(markID int) error {
 }
 
 func (s *ServiceV1) UpdateMark(mark models.Mark) error {
-	err := s.repository.UpdateMark(mark)
+	dateLayout := "2006-01-02" // Layout for "YYYY-MM-DD" format
+	parsedDate, err := time.Parse(dateLayout, mark.Date)
+
+	mark.Date = parsedDate.String()
+
+	err = s.repository.UpdateMark(mark)
 	if err != nil {
 		return err
 	}

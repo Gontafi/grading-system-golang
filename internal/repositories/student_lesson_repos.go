@@ -32,7 +32,7 @@ func (r *RepositoryV1) RemoveStudentFromLesson(studentID int, lessonID int) erro
 func (r *RepositoryV1) GetStudentsForLesson(lessonID int) ([]models.User, error) {
 	rows, err := r.db.Query(
 		r.ctx,
-		`SELECT s.id, s.name, s.surname FROM users s JOIN lessons l ON s.id = l.id WHERE l.id = $1`,
+		`SELECT s.id, s.name, s.username FROM users s JOIN lessons l ON s.id = l.id WHERE l.id = $1`,
 		lessonID)
 	if err != nil {
 		return []models.User{}, err
@@ -42,7 +42,7 @@ func (r *RepositoryV1) GetStudentsForLesson(lessonID int) ([]models.User, error)
 	var users []models.User
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.ID, &user.Name, &user.Surname)
+		err := rows.Scan(&user.ID, &user.Name, &user.Username)
 		if err != nil {
 			return []models.User{}, err
 		}

@@ -7,7 +7,7 @@ import (
 )
 
 func (s *ServiceV1) AddUser(user models.User) (int, error) {
-	if user.Username == "" || user.RoleID == 0 || user.Name == "" || user.Surname == "" {
+	if user.Username == "" || user.Name == "" {
 		return 0, errors.New("user data cannot be empty")
 	}
 
@@ -32,7 +32,7 @@ func (s *ServiceV1) DeleteUser(id int) error {
 }
 
 func (s *ServiceV1) UpdateUser(user models.User) error {
-	if user.Username == "" || user.PasswordHash == "" || user.Name == "" || user.Surname == "" {
+	if user.Username == "" || user.PasswordHash == "" || user.Name == "" {
 		return errors.New("user data cannot be empty")
 	}
 	err := s.repository.UpdateUser(user)

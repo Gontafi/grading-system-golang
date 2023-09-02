@@ -2,9 +2,12 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"github.com/grading-system-golang/internal/models"
 	"github.com/grading-system-golang/internal/repositories"
 	"github.com/redis/go-redis/v9"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -35,9 +38,18 @@ type Service interface {
 	UpdateLesson(lesson models.Lesson) error
 	GetAllLessons() ([]models.Lesson, error)
 	GetLessonByID(id int) (models.Lesson, error)
+	AddRoleUser(roleID int, userID int) (int, error)
+	RemoveRoleUser(roleID int, userID int) error
+	GetUsersForRole(roleID int) ([]models.User, error)
+	GetRolesForUser(userID int) ([]models.Role, error)
+	GetUserRole(userID int) (models.Role, error)
 
-	GetTopRatingFromCache(period time.Duration, limit int) ([]models.Rating, error)
+	RegisterUser(user models.User) (int, error)
+	GetTokenFromUser(username string, password string) (string, error)
+	ParseToken(accessToken string) (*Claims, error)
+	GetTopRatingFromCache(period string, limit int) ([]models.Rating, error)
 	GetTopRatingByLessonFromCache(lessonID int, period time.Duration, limit int) ([]models.Rating, error)
+
 	getCacheKey(baseKey string, args ...interface{}) string
 }
 
@@ -59,5 +71,24 @@ func NewService(
 		rdb:        rdb,
 		ctx:        ctx,
 		expiry:     expiry,
+	}
+}
+
+func (s *ServiceV1) getCacheKey(baseKey string, args ...interface{}) string {
+	keyParts := []string{baseKey}
+	for _, arg := range args {
+		keyParts = append(keyParts, argToString(arg))
+	}
+	return strings.Join(keyParts, ":")
+}
+
+func argToString(arg interface{}) string {
+	switch v := arg.(type) {
+	case time.Duration:
+		return v.String()
+	case int:
+		return strconv.Itoa(v)
+	default:
+		return fmt.Sprintf("%v", v)
 	}
 }

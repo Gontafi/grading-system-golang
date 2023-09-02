@@ -8,28 +8,11 @@ import (
 	"time"
 )
 
-const (
-	weekDuration  = time.Hour * 24 * 7
-	monthDuration = weekDuration * 4
-	yearDuration  = time.Hour * 24 * 365
-)
-
 func (h *Handler) GetTopRatingFromCache(ctx *fiber.Ctx) error {
 	periodParam := ctx.Query("period")
 	limitParam := ctx.Query("limit")
 
-	var period time.Duration
-	switch periodParam {
-	case "week":
-		period = weekDuration
-	case "month":
-		period = monthDuration
-	case "year":
-		period = yearDuration
-	default:
-		period = 0
-	}
-	if period == 0 {
+	if periodParam == "" {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid period"})
 	}
 
@@ -39,10 +22,12 @@ func (h *Handler) GetTopRatingFromCache(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid limit"})
 	}
 
-	ratings, err := h.Service.GetTopRatingFromCache(period, limit)
+	ratings, err := h.Service.GetTopRatingFromCache(periodParam, limit)
 	if err != nil {
 		log.Println(err)
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve top ratings", "err": err})
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve top ratings", "err": err,
+		})
 	}
 
 	return ctx.JSON(ratings)

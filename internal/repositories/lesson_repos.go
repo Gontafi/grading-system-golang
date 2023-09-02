@@ -19,7 +19,7 @@ func (r *RepositoryV1) AddLesson(lesson models.Lesson) (int, error) {
 }
 
 func (r *RepositoryV1) DeleteLesson(id int) error {
-	_, err := r.db.Exec(r.ctx, `DELETE FROM lessons WHERE UserID = $1`, id)
+	_, err := r.db.Exec(r.ctx, `DELETE FROM lessons WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
