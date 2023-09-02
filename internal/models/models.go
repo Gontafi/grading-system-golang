@@ -42,8 +42,7 @@ type Mark struct {
 }
 
 type Rating struct {
-	StudentID      int     `json:"student_id"`
-	StudentName    string  `json:"student_name"`
-	StudentSurname string  `json:"student_surname"`
-	Score          float64 `json:"score"`
+	StudentID   int     `json:"student_id"`
+	StudentName string  `json:"student_name"`
+	Score       float64 `json:"score"`
 }

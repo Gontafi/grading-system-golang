@@ -34,7 +34,11 @@ func (r *RepositoryV1) GetTopRating(period time.Duration, limit int) ([]models.R
 
 	for rows.Next() {
 		var rating models.Rating
-		err := rows.Scan(&rating.StudentID, &rating.StudentName, &rating.StudentSurname, &rating.Score)
+		err := rows.Scan(
+			&rating.StudentID,
+			&rating.StudentName,
+			&rating.Score,
+		)
 		if err != nil {
 			return []models.Rating{}, err
 		}
@@ -74,9 +78,11 @@ func (r *RepositoryV1) GetTopRatingByLesson(lessonID int, period time.Duration, 
 
 	for rows.Next() {
 		var rating models.Rating
-		err := rows.Scan(&rating.StudentID,
+		err := rows.Scan(
+			&rating.StudentID,
 			&rating.StudentName,
-			&rating.StudentSurname, &rating.Score)
+			&rating.Score,
+		)
 		if err != nil {
 			return nil, err
 		}
