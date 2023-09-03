@@ -23,8 +23,11 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 	teacherRoute := app.Group("/marks", h.TeacherRoleMiddleware())
 	{
 		teacherRoute.Post("/check-homework", h.CheckHomeWorkAndPutGrades)
-		teacherRoute.Put("/change-mark/:id", h.UpdateMark)
-		teacherRoute.Delete("/delete-mark/:id", h.DeleteMark)
+		teacherMarkEditRoute := teacherRoute.Group("/", h.MarkBelongsTeacherMiddleware())
+		{
+			teacherMarkEditRoute.Put("/change-mark/:id", h.UpdateMark)
+			teacherMarkEditRoute.Delete("/delete-mark/:id", h.DeleteMark)
+		}
 	}
 
 	topRatings := app.Group("/top-ratings")
