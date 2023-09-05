@@ -57,3 +57,12 @@ func (s *ServiceV1) GetLessonByID(id int) (models.Lesson, error) {
 
 	return lesson, nil
 }
+
+func (s *ServiceV1) GetLessonFromMark(markID int) (models.Lesson, error) {
+	lesson, err := s.repository.GetLessonFromMark(markID)
+	if err != nil {
+		return models.Lesson{}, err
+	}
+
+	return lesson, nil
+}

@@ -20,7 +20,7 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 		auth.Post("/sign-up", h.SignUp)
 	}
 
-	teacherRoute := app.Group("/marks", h.TeacherRoleMiddleware())
+	teacherRoute := app.Group("/teacher", h.TeacherRoleMiddleware())
 	{
 		teacherRoute.Post("/check-homework", h.CheckHomeWorkAndPutGrades)
 		teacherMarkEditRoute := teacherRoute.Group("/", h.MarkBelongsTeacherMiddleware())
@@ -28,6 +28,12 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 			teacherMarkEditRoute.Put("/change-mark/:id", h.UpdateMark)
 			teacherMarkEditRoute.Delete("/delete-mark/:id", h.DeleteMark)
 		}
+	}
+	studentRoute := app.Group("/student", h.StudentRoleMiddleware())
+	{
+		studentRoute.Post("/", h.StudentBelongsLesson(), h.CreateHomeWork)
+		studentRoute.Put("/:id", h.StudentBelongsLesson(), h.UpdateHomeWork)
+		studentRoute.Delete("/:id", h.DeleteHomeWork)
 	}
 
 	topRatings := app.Group("/top-ratings")
@@ -40,16 +46,18 @@ func (h *Handler) InitRoutes(app *fiber.App) {
 		topRatingsByLesson.Get("/", h.GetTopRatingByLessonFromCache)
 	}
 
-	api := app.Group("/api")
-	api.Use(h.AuthMiddleware())
-
+	api := app.Group("/api", h.AuthMiddleware())
 	lessons := api.Group("/lessons")
 	{
 		lessons.Get("/", h.GetLessons)
 		lessons.Get("/:id", h.GetLesson)
 		lessons.Get("students/:student_id", h.GetLessonsForStudent)
 	}
-
+	homeworks := api.Group("/home-work")
+	{
+		homeworks.Get("/", h.GetHomeWorks)
+		homeworks.Get("/:id", h.GetHomeWork)
+	}
 	marks := api.Group("/marks")
 	{
 		marks.Get("/:id", h.GetMark)

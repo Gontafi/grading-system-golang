@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
-    container_name: my_postgres_db
+    container_name: postgres_db
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
@@ -13,11 +13,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:latest
-    container_name: my_redis
+    container_name: redis_db
     ports:
       - "6379:6379"
   app:
-    container_name: your-app-container
+    container_name: grading-service
     restart: always
     build:
       context: .

@@ -22,8 +22,9 @@ type RoleUser struct {
 	UserID int `json:"userID"`
 }
 type Lesson struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	TeacherID int    `json:"teacher_id"`
 }
 type StudentLesson struct {
 	ID        int `json:"id"`
@@ -31,11 +32,17 @@ type StudentLesson struct {
 	LessonID  int `json:"lesson_id"`
 }
 
+type HomeWork struct {
+	ID               int    `json:"id"`
+	StudentID        int    `json:"student_id"`
+	LessonID         int    `json:"lesson_id"`
+	TeacherID        int    `json:"teacher_id"`
+	StatusID         int    `json:"status_id"`
+	HomeTaskResponse string `json:"home_task_response"`
+}
 type Mark struct {
 	ID              int    `json:"id"`
-	TeacherID       int    `json:"teacher_id"`
-	StudentID       int    `json:"student_id"`
-	LessonID        int    `json:"lesson_id"`
+	HomeWorkID      int    `json:"home_work_id"`
 	HomeWorkGrade   int    `json:"home_work_grade"`
 	AttendanceGrade int    `json:"attendance_grade"`
 	Date            string `json:"date"`

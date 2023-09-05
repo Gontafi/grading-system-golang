@@ -27,7 +27,7 @@ type Service interface {
 	RemoveStudentFromLesson(studentID int, lessonID int) error
 	GetStudentsForLesson(lessonID int) ([]models.User, error)
 	GetLessonsForStudent(studentID int) ([]models.Lesson, error)
-	GetStudentLesson(studentID int, lessonID int) (models.StudentLesson, error)
+	GetStudentLesson(studentID int, lessonID int) (models.HomeWork, error)
 	CreateMark(mark models.Mark) (int, error)
 	GetMarkByID(markID int) (models.Mark, error)
 	GetAllMarks() ([]models.Mark, error)

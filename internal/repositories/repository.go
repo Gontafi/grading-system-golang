@@ -17,7 +17,7 @@ type Repository interface {
 	RemoveStudentFromLesson(studentID int, lessonID int) error
 	GetStudentsForLesson(lessonID int) ([]models.User, error)
 	GetLessonsForStudent(studentID int) ([]models.Lesson, error)
-	GetStudentLesson(studentID int, lessonID int) (models.StudentLesson, error)
+	GetStudentLesson(studentID int, lessonID int) (models.HomeWork, error)
 	AddLesson(lesson models.Lesson) (int, error)
 	DeleteLesson(id int) error
 	UpdateLesson(lesson models.Lesson) error

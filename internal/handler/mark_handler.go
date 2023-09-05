@@ -21,16 +21,6 @@ func (h *Handler) CheckHomeWorkAndPutGrades(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid date format"})
 	}
 
-	studentLesson, err := h.Service.GetStudentLesson(request.StudentID, request.LessonID)
-	if err != nil || studentLesson.ID == 0 {
-		log.Println(err)
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error":      "student has not this subject",
-			"student_id": request.StudentID,
-			"lesson_id":  request.LessonID,
-		})
-	}
-
 	markID, err := h.Service.CreateMark(request)
 	if err != nil {
 		log.Println(err)

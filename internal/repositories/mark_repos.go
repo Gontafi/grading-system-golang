@@ -5,18 +5,15 @@ import (
 )
 
 func (r *RepositoryV1) CreateMark(mark models.Mark) (int, error) {
-	_, err := r.GetStudentLesson(mark.StudentID, mark.LessonID)
-	if err != nil {
-		return 0, err
-	}
-
 	var markID int
-	err = r.db.QueryRow(
-		r.ctx, `
-		INSERT INTO marks (teacher_id, student_id, lesson_id, home_work_grade, attendance_grade, date)
-		VALUES ($1, $2, $3, $4, $5, $6)
+	err := r.db.QueryRow(
+		r.ctx,
+		`
+		INSERT INTO marks (home_work_id, home_work_grade, attendance_grade, date)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id
-	`, mark.TeacherID, mark.StudentID, mark.LessonID, mark.HomeWorkGrade, mark.AttendanceGrade, mark.Date).Scan(&markID)
+		`,
+		mark.HomeWorkID, mark.HomeWorkGrade, mark.AttendanceGrade, mark.Date).Scan(&markID)
 
 	if err != nil {
 		return 0, err
@@ -30,11 +27,10 @@ func (r *RepositoryV1) GetMarkByID(markID int) (models.Mark, error) {
 	err := r.db.QueryRow(
 		r.ctx,
 		`
-			SELECT id, teacher_id, student_id, lesson_id, home_work_grade, attendance_grade, date 
-			FROM marks WHERE id = $1`,
+		SELECT id, home_work_id, home_work_grade, attendance_grade, date
+		FROM marks WHERE id = $1`,
 		markID,
-	).Scan(&mark.ID, &mark.TeacherID, &mark.StudentID, &mark.LessonID,
-		&mark.HomeWorkGrade, &mark.AttendanceGrade, &mark.Date)
+	).Scan(&mark.ID, &mark.HomeWorkID, &mark.HomeWorkGrade, &mark.AttendanceGrade, &mark.Date)
 
 	if err != nil {
 		return models.Mark{}, err
@@ -48,8 +44,8 @@ func (r *RepositoryV1) GetAllMarks() ([]models.Mark, error) {
 	rows, err := r.db.Query(
 		r.ctx,
 		`
-			SELECT id, teacher_id, student_id, lesson_id, home_work_grade, attendance_grade, date 
-			FROM marks`,
+		SELECT id, home_work_id, home_work_grade, attendance_grade, date
+		FROM marks`,
 	)
 	if err != nil {
 		return []models.Mark{}, err
@@ -59,11 +55,11 @@ func (r *RepositoryV1) GetAllMarks() ([]models.Mark, error) {
 
 	for rows.Next() {
 		var mark models.Mark
-		err := rows.Scan(&mark.ID, &mark.TeacherID, &mark.StudentID, &mark.LessonID,
-			&mark.HomeWorkGrade, &mark.AttendanceGrade, &mark.Date)
+		err := rows.Scan(&mark.ID, &mark.HomeWorkID, &mark.HomeWorkGrade, &mark.AttendanceGrade, &mark.Date)
 		if err != nil {
 			return []models.Mark{}, err
 		}
+		marks = append(marks, mark)
 	}
 
 	return marks, nil
@@ -81,10 +77,8 @@ func (r *RepositoryV1) DeleteMark(markID int) error {
 func (r *RepositoryV1) UpdateMark(mark models.Mark) error {
 	_, err := r.db.Exec(
 		r.ctx,
-		`UPDATE marks set teacher_id = $2, student_id = $3, lesson_id = $4, home_work_grade = $5, 
-                 attendance_grade = $6, Date = $7 WHERE id = $1`,
-		mark.ID, mark.TeacherID, mark.StudentID, mark.LessonID,
-		mark.HomeWorkGrade, mark.AttendanceGrade, mark.Date,
+		`UPDATE marks set home_work_id = $2, home_work_grade = $3, attendance_grade = $4, date = $5 WHERE id = $1`,
+		mark.ID, mark.HomeWorkID, mark.HomeWorkGrade, mark.AttendanceGrade, mark.Date,
 	)
 	if err != nil {
 		return err

@@ -8,7 +8,7 @@ func (r *RepositoryV1) AddStudentToLesson(studentID int, lessonID int) (int, err
 	var id int
 	err :=
 		r.db.QueryRow(r.ctx,
-			`INSERT INTO student_lesson(student_id, lesson_id) VALUES($1, $2)`,
+			`INSERT INTO student_lesson(student_id, lesson_id) VALUES($1, $2) returning id`,
 			studentID, lessonID).Scan(&id)
 	if err != nil {
 		return 0, err
