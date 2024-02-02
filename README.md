@@ -38,4 +38,3 @@ curl -X POST -H "Content-Type: application/json" -d '{
     "password": "example_password"
 }' http://localhost:8080/auth/sign-in/
 ```
-Postman collections will be tomorrow...
